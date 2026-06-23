@@ -1,425 +1,911 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exchange One Cost Generator</title>
+    <title>Treasury Dashboard Pro</title>
     <style>
-        :root {
-            --bg-color: #F5F5F7;
-            --card-bg: #FFFFFF;
-            --text-main: #1D1D1F;
-            --text-muted: #86868B;
-            --border-color: #E5E5EA;
-            --accent: #000000;
+        /* ================= Global Reset & Fixes ================= */
+        *, *::before, *::after {
+            box-sizing: border-box;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-            line-height: 1.5;
+        body, html {
+            margin: 0; padding: 0;
+            width: 100vw; height: 100vh;
+            background-color: #e0e3eb; 
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        .container {
-            max-width: 800px;
-            width: 100%;
-        }
-
-        h1 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 24px;
-            letter-spacing: -0.5px;
-        }
-
-        .section {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-        }
-
-        .section-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 16px;
-            letter-spacing: 1px;
-        }
-
-        .grid-2 {
+        /* 4-Quarter Grid Layout */
+        .dashboard {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            grid-template-rows: 1fr 1fr;
+            width: 100vw;
+            height: calc(100vh - 48px); 
+            gap: 2px;
         }
 
-        .grid-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 20px;
-        }
-
-        .input-group {
+        .panel {
+            background-color: #ffffff;
+            width: 100%; height: 100%;
+            position: relative;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            gap: 8px;
         }
 
-        label {
-            font-size: 13px;
-            font-weight: 500;
+        /* ================= Cost Generator Panel ================= */
+        .cost-generator {
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; 
+            gap: 24px;
         }
 
-        input[type="number"], input[type="text"], textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 15px;
-            background-color: #FAFAFA;
-            transition: all 0.2s ease;
-            box-sizing: border-box;
-            font-family: inherit;
-            font-weight: 400; /* 确保不加粗 */
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-            background-color: #FFF;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        /* 专门针对结果输出框，确保纯文本样式 */
-        .result-box {
-            background-color: #F8F8F8;
-            font-family: -apple-system, sans-serif;
-            font-size: 14px;
-            font-weight: 400; /* 强制正常粗细 */
-            color: #000;
-            min-height: 160px;
-            line-height: 1.6;
-        }
-
-        .btn {
-            background-color: var(--accent);
-            color: #FFF;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: transform 0.1s, opacity 0.2s;
-            display: inline-flex;
+        /* --- Header --- */
+        .cg-header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            width: 100%;
-            box-sizing: border-box;
-            text-decoration: none; /* 针对a标签 */
+            border-bottom: 2px solid #f0f3fa;
+            padding-bottom: 16px;
+            flex-shrink: 0;
+        }
+        .cg-header .title { 
+            font-size: 18px; 
+            font-weight: 800; 
+            color: #2962FF; 
+            letter-spacing: 1px;
+        }
+        .cg-header .links {
+            display: flex;
+            gap: 12px;
+        }
+        .cg-header .links a {
+            font-size: 14px; font-weight: 600; color: #434651; 
+            text-decoration: none;
+            background: #ffffff; border: 1px solid #d1d4dc; 
+            border-radius: 6px; padding: 6px 16px;
+            transition: all .2s;
+        }
+        .cg-header .links a:hover { 
+            color: #2962FF; border-color: #2962FF; background: #f0f3fa; 
         }
 
-        .btn:hover {
-            opacity: 0.85;
+        /* --- Main Layout (Left Inputs + Right Output) --- */
+        .cg-main {
+            display: flex;
+            gap: 30px;
+            flex: 1; 
+            min-height: 0;
         }
 
-        .btn:active {
-            transform: scale(0.98);
+        /* Left Side: Controls */
+        .cg-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            min-width: 0; 
+            justify-content: space-between; 
         }
 
-        .btn-outline {
-            background-color: transparent;
-            color: var(--accent);
-            border: 1px solid var(--border-color);
+        /* OCR Input */
+        .ocr-row { 
+            display: flex; gap: 16px; 
+            flex-shrink: 0;
         }
-
-        .btn-outline:hover {
-            border-color: var(--accent);
+        .ocr-row textarea {
+            flex: 1; height: 50px; background: #f8f9fd; border: 1px solid #d1d4dc;
+            border-radius: 8px; padding: 12px 16px; font-size: 15px; resize: none;
+            color: #131722; transition: border-color 0.2s;
         }
-
-        .link-btn {
-            width: auto; 
-            padding: 0 16px; 
+        .ocr-row textarea:focus { outline: none; border-color: #2962FF; }
+        .btn-extract { 
+            font-size: 15px; font-weight: 600; cursor: pointer; padding: 0 24px; 
+            border: 1px solid #d1d4dc; border-radius: 8px; background: #fff; color: #434651;
+            transition: all 0.2s;
+        }
+        .btn-extract:hover { background: #f0f3fa; color: #2962FF; border-color: #2962FF; }
+        .btn-clear {
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid #d1d4dc;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #787b86;
+            transition: all 0.2s;
             white-space: nowrap;
         }
+        .ocr-row .btn-clear { padding: 0 16px; }
+        .btn-clear:hover { background: #fff5f5; color: #d50000; border-color: #ffcdd2; }
 
-        .hint {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 4px;
+        /* Rates & Margins Card */
+        .control-card {
+            background: #f8f9fd;
+            border: 1px solid #e0e3eb;
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            flex: 1;
+            justify-content: center;
         }
 
-        .chart-wrap {
-            margin-top: 20px;
+        /* 修复出框：使用 minmax(0, 1fr) 强制控制列宽边界 */
+        .rates-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr)); 
+            gap: 20px 16px;
+        }
+        .input-group { 
+            display: flex; align-items: center; gap: 10px; 
+        }
+        .input-group label { 
+            width: 70px; font-size: 14px; color: #787b86; font-weight: 600; text-align: right; flex-shrink: 0;
+        }
+        .input-group input {
+            flex: 1; min-width: 0; width: 100%; padding: 10px 12px; border: 1px solid #d1d4dc;
+            border-radius: 6px; font-family: 'Courier New', Courier, monospace; 
+            font-size: 16px; font-weight: 700; color: #131722; transition: all 0.2s;
+        }
+        .input-group input:focus { outline: none; border-color: #2962FF; box-shadow: 0 0 0 2px rgba(41,98,255,0.1); }
+
+        .margin-row {
+            display: flex;
+            gap: 24px;
+            padding-top: 20px;
+            border-top: 1px dashed #d1d4dc;
+            align-items: center;
+        }
+        
+        /* 核心数据突出显示：LP Highlight Badge */
+        .lp-highlight { 
+            margin-left: auto; /* 推到最右侧 */
+            background: #eef2ff; /* 浅蓝底色 */
+            border: 2px solid #2962FF; /* 深蓝强调边框 */
+            border-radius: 8px;
+            padding: 8px 20px;
+            font-size: 16px; 
+            color: #2962FF; 
+            font-weight: 800; 
+            box-shadow: 0 4px 12px rgba(41, 98, 255, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: 0.5px;
+        }
+        .lp-highlight span {
+            color: #131722; /* 具体的数值用黑色强调 */
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 18px;
         }
 
-        .chart-frame {
-            height: 420px;
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
+        /* Right Side: Output text */
+        .cg-right {
+            width: 280px; 
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+        .output-area {
+            flex: 1; background: #f8f9fd; border: 1px solid #e0e3eb;
+            border-radius: 12px; padding: 20px; font-size: 15px; line-height: 1.8; 
+            resize: none; color: #131722; outline: none;
+        }
+        .btn-copy {
+            background: #2962FF; color: #fff; border: none; border-radius: 8px;
+            padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer;
+            transition: background 0.2s; flex-shrink: 0;
+        }
+        .btn-copy:hover { background: #1e53e5; }
+
+        /* --- Excel-like Workspace (Bottom) --- */
+        .excel-section {
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            height: 168px;
+            min-height: 0;
+        }
+        .excel-title { 
+            font-size: 13px; color: #787b86; margin-bottom: 6px;
+            display: flex; justify-content: space-between; align-items: center; font-weight: 600;
+        }
+        .excel-title-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+        .excel-title .btn-clear {
+            padding: 4px 10px;
+        }
+        .excel-status {
+            color: #2962FF;
+            max-width: 58%;
             overflow: hidden;
-            background: #fff;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: right;
         }
-
-        .tradingview-widget-copyright {
-            padding: 8px 12px 10px;
+        .excel-wrapper {
+            border: 1px solid #d1d4dc;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            flex: 1;
+        }
+        .formula-row {
+            display: grid;
+            grid-template-columns: 74px 34px minmax(0, 1fr);
+            align-items: center;
+            background: #f8f9fd;
+            border-bottom: 1px solid #d1d4dc;
+            min-height: 34px;
+        }
+        .name-box {
+            height: 100%;
+            border: none;
+            border-right: 1px solid #d1d4dc;
+            background: #ffffff;
+            color: #434651;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+            outline: none;
+        }
+        .fx-label {
+            color: #787b86;
+            font-style: italic;
+            font-weight: 700;
+            text-align: center;
+            border-right: 1px solid #d1d4dc;
+            user-select: none;
+        }
+        .formula-input {
+            height: 100%;
+            border: none;
+            padding: 0 10px;
+            color: #131722;
+            font: 14px "Courier New", Courier, monospace;
+            outline: none;
+        }
+        .sheet-viewport {
+            flex: 1;
+            min-height: 0;
+            overflow: auto;
+            background: #ffffff;
+        }
+        .excel-grid {
+            display: grid;
+            grid-template-columns: 42px repeat(10, minmax(86px, 1fr));
+            grid-auto-rows: 28px;
+            min-width: 902px;
+            background: #d1d4dc;
+            gap: 1px;
+        }
+        .sheet-corner,
+        .col-header,
+        .row-header {
+            background: #f0f3fa;
+            color: #434651;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 12px;
-            color: var(--text-muted);
+            font-weight: 700;
+            user-select: none;
         }
-
-        .tradingview-widget-copyright a {
-            color: inherit;
-            text-decoration: none;
+        .col-header.active,
+        .row-header.active {
+            background: #dbe6ff;
+            color: #2962FF;
         }
-
-        .tradingview-widget-copyright a:hover {
-            text-decoration: underline;
+        .excel-cell {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #ffffff;
+            padding: 0 8px;
+            color: #131722;
+            font: 14px "Courier New", Courier, monospace;
+            outline: none;
+            transition: background .1s;
         }
-
-        @media (max-width: 720px) {
-            body {
-                padding: 24px 14px;
-            }
-
-            .section {
-                padding: 18px;
-            }
-
-            .grid-2,
-            .grid-3 {
-                grid-template-columns: 1fr;
-            }
-
-            .chart-frame {
-                height: 360px;
-            }
+        .excel-cell:focus {
+            background: #ffffff;
+            color: #131722;
+            box-shadow: inset 0 0 0 2px #2962FF;
+            position: relative;
+            z-index: 2;
+        }
+        .excel-cell.formula {
+            color: #00897b;
+        }
+        .excel-cell.error {
+            color: #d50000;
+            background: #fff5f5;
+        }
+        .excel-cell.ref-active {
+            background: #eef7ff;
+            box-shadow: inset 0 0 0 2px #00a3ff;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Exchange One Cost Generator</h1>
-
-    <div class="section">
-        <div class="section-title">1. OCR </div>
-        <div class="input-group">
-            <textarea id="raw-text" placeholder="paste OCR text."></textarea>
-            <button class="btn btn-outline" onclick="smartExtract()" style="margin-top: 8px;">Analyse</button>
+<div class="dashboard">
+    <div class="panel">
+        <div class="tradingview-widget-container" style="height:100%;width:100%">
+          <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+          {
+          "allow_symbol_change": true, "interval": "5", "timezone": "Australia/Sydney", "theme": "light", "style": "1", "locale": "en",
+          "symbol": "CMCMARKETS:USDAUD", "backgroundColor": "#ffffff", "gridColor": "rgba(46, 46, 46, 0.06)", "autosize": true
+          }
+          </script>
         </div>
-
     </div>
 
-    <div class="section">
-        <div class="section-title">2. Data Check</div>
-        <div class="grid-3">
-            <div class="input-group">
-                <label>USD/CNY</label>
-                <input type="number" id="v-renmei" step="0.0001" oninput="autoUpdate()">
-            </div>
-            <div class="input-group">
-                <label>USDT/CNY</label>
-                <input type="number" id="v-renu" step="0.0001" oninput="autoUpdate()">
-            </div>
-            <div class="input-group">
-                <label>HKD/CNY </label>
-                <input type="number" id="v-rengang" step="0.0001" oninput="autoUpdate()">
+    <div class="panel cost-generator">
+        <div class="cg-header">
+            <span class="title">COST GENERATOR</span>
+            <div class="links">
+                <a href="https://www.moneychain.com.au/exchange-rates/" target="_blank">Rates</a>
+                <a href="https://www.boc.cn/sourcedb/whpj/" target="_blank">Bank Rate</a>
+                <a href="https://shinyuan-my.sharepoint.com/:x:/r/personal/database_shinyuan_com_au/_layouts/15/Doc.aspx?sourcedoc=%7B946037A2-05E4-4407-921E-9D23BCEDF0DE%7D&file=%5BAmanda%5D%20Transaction%20Summary%20-%20Strictly%20Confidential.xlsx&action=default&mobileredirect=true&DefaultItemOpen=1" target="_blank" title="Transaction Summary Excel">Transaction</a>
             </div>
         </div>
 
-        <div class="grid-2" style="margin-top: 20px;">
-            <div class="input-group">
-                <label>澳人</label>
-                <div style="display: flex; gap: 8px;">
-                    <input type="number" id="v-aoren" step="0.0001" oninput="autoUpdate()">
-                    <a href="https://www.moneychain.com.au/exchange-rates/" target="_blank" class="btn btn-outline link-btn">查价</a>
+        <div class="cg-main">
+            <div class="cg-left">
+                <div class="ocr-row">
+                    <textarea id="raw-text" placeholder="Paste OCR text here..."></textarea>
+                    <button class="btn-extract" onclick="smartExtract()">Extract</button>
+                    <button class="btn-clear" onclick="clearCostGenerator()">Clear</button>
+                </div>
+
+                <div class="control-card">
+                    <div class="rates-grid">
+                        <div class="input-group"><label>USD/CNY</label><input type="text" id="v-renmei" oninput="autoUpdate()" onblur="evalStandard(this)"></div>
+                        <div class="input-group"><label>USDT/CNY</label><input type="text" id="v-renu" oninput="autoUpdate()" onblur="evalStandard(this)"></div>
+                        <div class="input-group"><label>HKD/CNY</label><input type="text" id="v-rengang" oninput="autoUpdate()" onblur="evalStandard(this)"></div>
+                        <div class="input-group"><label>AUD/CNY</label><input type="text" id="v-aoren" oninput="autoUpdate()" onblur="evalStandard(this)"></div>
+                        <div class="input-group"><label>USD/AUD</label><input type="text" id="v-usdaud" oninput="autoUpdate()" onblur="evalStandard(this)"></div>
+                    </div>
+                    <div class="margin-row">
+                        <div class="input-group" style="max-width: 180px;"><label>POBO%</label><input type="text" id="m-pobo" value="0.4" oninput="autoUpdate()" onblur="evalStandard(this)"></div>
+                        <div class="input-group" style="max-width: 180px;"><label>LP%</label><input type="text" id="m-lp" value="0.25" oninput="autoUpdate()" onblur="evalStandard(this)"></div>
+                        
+                        <div class="lp-highlight" id="lp-hint">
+                            LP Rate: <span>—</span> &nbsp;|&nbsp; A/U: <span>—</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="input-group">
-                <label>USD/AUD</label>
-                <div style="display: flex; gap: 8px;">
-                    <input type="number" id="v-usdaud" step="0.0001" oninput="autoUpdate()">
-                    <a href="https://platform.cmcmarkets.com/#/app?b=CMC-CFD&r=AU" target="_blank" class="btn btn-outline link-btn">看盘</a>
+
+            <div class="cg-right">
+                <textarea class="output-area" id="output-box" readonly></textarea>
+                <button class="btn-copy" onclick="copyResult()">Copy Result</button>
+            </div>
+        </div>
+
+        <div class="excel-section">
+            <div class="excel-title">
+                <div class="excel-title-left">
+                    <span>Spreadsheet Workspace</span>
+                    <button class="btn-clear" onclick="clearExcelGrid()">Clear</button>
+                </div>
+                <span id="sheet-status" class="excel-status">Ready</span>
+            </div>
+            <div class="excel-wrapper">
+                <div class="formula-row">
+                    <input class="name-box" id="name-box" value="A1" readonly>
+                    <div class="fx-label">fx</div>
+                    <input class="formula-input" id="formula-bar" autocomplete="off" spellcheck="false">
+                </div>
+                <div class="sheet-viewport">
+                    <div class="excel-grid" id="excel-grid"></div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="chart-wrap">
-            <div class="section-title">USD/AUD Live Chart</div>
-            <div class="chart-frame">
-                <!-- TradingView Widget BEGIN -->
-                <div class="tradingview-widget-container" style="height:100%;width:100%">
-                    <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
-                    <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/symbols/USDAUD/?exchange=CMCMARKETS" rel="noopener nofollow" target="_blank"><span class="blue-text">USDAUD chart</span></a><span class="trademark"> by TradingView</span></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                    {
-                    "allow_symbol_change": true,
-                    "calendar": false,
-                    "details": false,
-                    "hide_side_toolbar": true,
-                    "hide_top_toolbar": false,
-                    "hide_legend": false,
-                    "hide_volume": false,
-                    "hotlist": false,
-                    "interval": "5",
-                    "locale": "en",
-                    "save_image": true,
-                    "style": "1",
-                    "symbol": "CMCMARKETS:USDAUD",
-                    "theme": "light",
-                    "timezone": "Etc/UTC",
-                    "backgroundColor": "#ffffff",
-                    "gridColor": "rgba(46, 46, 46, 0.06)",
-                    "watchlist": [],
-                    "withdateranges": false,
-                    "compareSymbols": [],
-                    "studies": [],
-                    "autosize": true
-                  }
-                    </script>
-                </div>
-                <!-- TradingView Widget END -->
-            </div>
+    <div class="panel">
+        <div class="tradingview-widget-container" style="height:100%;width:100%">
+          <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+          {
+          "allow_symbol_change": true, "interval": "5", "timezone": "Australia/Sydney", "theme": "light", "style": "1", "locale": "en",
+          "symbol": "CMCMARKETS:AUDCNH", "backgroundColor": "#ffffff", "gridColor": "rgba(46, 46, 46, 0.06)", "autosize": true
+          }
+          </script>
         </div>
     </div>
 
-    <div class="section">
-        <div class="section-title">3. PSP/LP Margin</div>
-        <div class="grid-2">
-            <div class="input-group">
-                <label>POBO Margin (%)</label>
-                <input type="number" id="m-pobo" step="0.01" value="0.4" oninput="autoUpdate()">
-            </div>
-            <div class="input-group">
-                <label>LP Margin (%)</label>
-                <input type="number" id="m-lp" step="0.01" value="0.25" oninput="autoUpdate()">
-                <div class="hint" id="lp-hint">辅助：LP USD/AUD: -- | LP AUD/USD: --</div>
-            </div>
+    <div class="panel">
+        <div class="tradingview-widget-container" style="height:100%;width:100%">
+          <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+          {
+          "allow_symbol_change": true, "interval": "5", "timezone": "Australia/Sydney", "theme": "light", "style": "1", "locale": "en",
+          "symbol": "CMCMARKETS:USDCNH", "backgroundColor": "#ffffff", "gridColor": "rgba(46, 46, 46, 0.06)", "autosize": true
+          }
+          </script>
         </div>
     </div>
-
-    <div class="section">
-        <div class="section-title">4. Text Generator </div>
-        <textarea id="output-box" class="result-box" readonly>等待数据输入...</textarea>
-        <button class="btn" onclick="copyResult()" style="margin-top: 12px;">一键复制文案</button>
-    </div>
-
 </div>
 
 <script>
-    // --- 1. 智能提取逻辑 ---
+    // --- Standard Input Calc (For Rates Panel) ---
+    function parseExcelMath(str) {
+        if (!str) return 0;
+        let expr = str.toString().trim();
+        if (expr.startsWith('=')) expr = expr.substring(1); 
+        if (/^[\d\.\+\-\*\/\(\)\s]+$/.test(expr)) {
+            try {
+                let result = Function('"use strict";return (' + expr + ')')();
+                return result === undefined || isNaN(result) ? 0 : result;
+            } catch { return 0; }
+        }
+        return parseFloat(str) || 0;
+    }
+
+    function evalStandard(el) {
+        if (!el.value) return;
+        let val = parseExcelMath(el.value);
+        if (val) el.value = Math.round(val * 100000) / 100000;
+        if (el.id.startsWith('v-') || el.id.startsWith('m-')) autoUpdate();
+    }
+
+    document.querySelectorAll('.input-group input').forEach(input => {
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') this.blur();
+        });
+    });
+
+    // --- Excel-like Grid ---
+    const gridData = {};
+    const cols = ['A', 'B', 'C', 'D', 'E', 'F'];
+    for (let i = 6; i < 10; i++) cols.push(String.fromCharCode(65 + i));
+    const rows = 20;
+    let activeCell = null;
+    let formulaEditing = false;
+    let formulaRefSelection = null;
+
+    function cellId(colIndex, rowIndex) {
+        return cols[colIndex] + rowIndex;
+    }
+
+    function parseCellId(id) {
+        const match = id.match(/^([A-J])(\d{1,2})$/);
+        if (!match) return null;
+        return { col: cols.indexOf(match[1]), row: parseInt(match[2], 10) };
+    }
+
+    function showStatus(text) {
+        document.getElementById('sheet-status').innerText = text;
+    }
+
+    function initExcel() {
+        const container = document.getElementById('excel-grid');
+        container.innerHTML = '';
+
+        const corner = document.createElement('div');
+        corner.className = 'sheet-corner';
+        container.appendChild(corner);
+
+        cols.forEach(col => {
+            const header = document.createElement('div');
+            header.className = 'col-header';
+            header.id = `col-${col}`;
+            header.innerText = col;
+            container.appendChild(header);
+        });
+
+        for (let r = 1; r <= rows; r++) {
+            const rowHeader = document.createElement('div');
+            rowHeader.className = 'row-header';
+            rowHeader.id = `row-${r}`;
+            rowHeader.innerText = r;
+            container.appendChild(rowHeader);
+
+            for (let c = 0; c < cols.length; c++) {
+                const id = cellId(c, r);
+                gridData[id] = { exp: '', val: '' };
+                const input = document.createElement('input');
+                input.id = id;
+                input.className = 'excel-cell';
+                input.dataset.cell = id;
+                input.autocomplete = 'off';
+                input.spellcheck = false;
+                
+                input.onfocus = () => selectCell(input);
+                input.oninput = () => {
+                    clearFormulaRefSelection();
+                    gridData[id].exp = input.value;
+                    document.getElementById('formula-bar').value = input.value;
+                };
+                input.onblur = () => commitCell(input);
+                input.onkeydown = (e) => handleCellKey(e, input);
+                input.onpaste = (e) => pasteIntoGrid(e, id);
+                input.onmousedown = (e) => {
+                    const bar = document.getElementById('formula-bar');
+                    const formulaText = formulaEditing ? bar.value : activeCell?.value || '';
+                    if (activeCell && activeCell !== input && shouldAppendCellRef(formulaText)) {
+                        e.preventDefault();
+                        appendCellRef(id);
+                        activeCell.focus();
+                    }
+                };
+                container.appendChild(input);
+            }
+        }
+
+        const bar = document.getElementById('formula-bar');
+        bar.onfocus = () => { formulaEditing = true; };
+        bar.oninput = () => {
+            if (!activeCell) return;
+            clearFormulaRefSelection();
+            activeCell.value = bar.value;
+            gridData[activeCell.id].exp = bar.value;
+        };
+        bar.onkeydown = (e) => {
+            if (!activeCell) return;
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                commitCell(activeCell);
+                moveActiveCell(0, 1);
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                bar.value = gridData[activeCell.id].exp;
+                activeCell.focus();
+            }
+        };
+        bar.onblur = () => { formulaEditing = false; refreshGrid(); };
+
+        selectCell(document.getElementById('A1'));
+        refreshGrid();
+    }
+
+    function selectCell(input) {
+        if (!input) return;
+        if (activeCell !== input) clearFormulaRefSelection();
+        activeCell = input;
+        document.querySelectorAll('.col-header.active, .row-header.active').forEach(el => el.classList.remove('active'));
+        const pos = parseCellId(input.id);
+        if (pos) {
+            document.getElementById(`col-${cols[pos.col]}`)?.classList.add('active');
+            document.getElementById(`row-${pos.row}`)?.classList.add('active');
+        }
+        document.getElementById('name-box').value = input.id;
+        document.getElementById('formula-bar').value = gridData[input.id].exp;
+        input.value = gridData[input.id].exp;
+        showStatus('Use =A1+B1, =SUM(A1:B3), paste from Excel');
+    }
+
+    function shouldAppendCellRef(text) {
+        const value = (text || '').trim();
+        if (!value.startsWith('=')) return false;
+        return /(?:=|[\+\-\*\/\(,:])\s*$/.test(value);
+    }
+
+    function clearFormulaRefSelection() {
+        if (formulaRefSelection?.refId) {
+            document.getElementById(formulaRefSelection.refId)?.classList.remove('ref-active');
+        }
+        formulaRefSelection = null;
+    }
+
+    function setFormulaRefSelection(refId, start, end) {
+        if (formulaRefSelection?.refId) {
+            document.getElementById(formulaRefSelection.refId)?.classList.remove('ref-active');
+        }
+        formulaRefSelection = { formulaCellId: activeCell.id, refId, start, end };
+        document.getElementById(refId)?.classList.add('ref-active');
+    }
+
+    function appendCellRef(id, replaceCurrent = false) {
+        if (!activeCell) return;
+        const bar = document.getElementById('formula-bar');
+        const target = formulaEditing ? bar : activeCell;
+        const canReplace = replaceCurrent && formulaRefSelection?.formulaCellId === activeCell.id;
+        const start = canReplace ? formulaRefSelection.start : target.selectionStart ?? target.value.length;
+        const end = canReplace ? formulaRefSelection.end : target.selectionEnd ?? target.value.length;
+        const nextValue = target.value.slice(0, start) + id + target.value.slice(end);
+
+        activeCell.value = nextValue;
+        bar.value = nextValue;
+        gridData[activeCell.id].exp = nextValue;
+
+        const nextPos = start + id.length;
+        setFormulaRefSelection(id, start, nextPos);
+        setTimeout(() => {
+            target.focus();
+            target.setSelectionRange(nextPos, nextPos);
+        }, 0);
+    }
+
+    function commitCell(input) {
+        if (!input) return;
+        clearFormulaRefSelection();
+        gridData[input.id].exp = input.value;
+        refreshGrid();
+    }
+
+    function handleCellKey(e, input) {
+        const nav = {
+            ArrowUp: [0, -1],
+            ArrowDown: [0, 1],
+            ArrowLeft: [-1, 0],
+            ArrowRight: [1, 0],
+            Tab: [e.shiftKey ? -1 : 1, 0],
+            Enter: [0, e.shiftKey ? -1 : 1]
+        };
+        if (!nav[e.key]) return;
+        const isEditingFormulaRef = formulaRefSelection?.formulaCellId === input.id;
+        if (e.key.startsWith('Arrow') && input.value.trim().startsWith('=') && (shouldAppendCellRef(input.value) || isEditingFormulaRef)) {
+            e.preventDefault();
+            appendNeighborRef(nav[e.key][0], nav[e.key][1]);
+            return;
+        }
+        e.preventDefault();
+        commitCell(input);
+        moveActiveCell(nav[e.key][0], nav[e.key][1]);
+    }
+
+    function moveActiveCell(colDelta, rowDelta) {
+        if (!activeCell) return;
+        const pos = parseCellId(activeCell.id);
+        if (!pos) return;
+        const nextCol = Math.max(0, Math.min(cols.length - 1, pos.col + colDelta));
+        const nextRow = Math.max(1, Math.min(rows, pos.row + rowDelta));
+        document.getElementById(cellId(nextCol, nextRow))?.focus();
+    }
+
+    function appendNeighborRef(colDelta, rowDelta) {
+        if (!activeCell) return;
+        const baseId = formulaRefSelection?.formulaCellId === activeCell.id ? formulaRefSelection.refId : activeCell.id;
+        const pos = parseCellId(baseId);
+        if (!pos) return;
+        const nextCol = Math.max(0, Math.min(cols.length - 1, pos.col + colDelta));
+        const nextRow = Math.max(1, Math.min(rows, pos.row + rowDelta));
+        const ref = cellId(nextCol, nextRow);
+        if (ref !== activeCell.id) appendCellRef(ref, formulaRefSelection?.formulaCellId === activeCell.id);
+    }
+
+    function pasteIntoGrid(e, startId) {
+        const text = e.clipboardData?.getData('text');
+        if (!text || (!text.includes('\t') && !text.includes('\n'))) return;
+        e.preventDefault();
+        const start = parseCellId(startId);
+        if (!start) return;
+        text.trimEnd().split(/\r?\n/).forEach((line, rOffset) => {
+            line.split('\t').forEach((value, cOffset) => {
+                const col = start.col + cOffset;
+                const row = start.row + rOffset;
+                if (col >= cols.length || row > rows) return;
+                gridData[cellId(col, row)].exp = value;
+            });
+        });
+        refreshGrid();
+        document.getElementById(startId)?.focus();
+        showStatus('Pasted');
+    }
+
+    function getCellNumber(id, stack = []) {
+        if (stack.includes(id)) throw new Error('CIRC');
+        const cell = gridData[id];
+        if (!cell) return 0;
+        const result = evaluateCell(id, [...stack, id]);
+        const num = parseFloat(result);
+        return isNaN(num) ? 0 : num;
+    }
+
+    function getRangeValues(start, end, stack = []) {
+        const a = parseCellId(start);
+        const b = parseCellId(end);
+        if (!a || !b) return [];
+        const values = [];
+        const colMin = Math.min(a.col, b.col);
+        const colMax = Math.max(a.col, b.col);
+        const rowMin = Math.min(a.row, b.row);
+        const rowMax = Math.max(a.row, b.row);
+        for (let r = rowMin; r <= rowMax; r++) {
+            for (let c = colMin; c <= colMax; c++) {
+                values.push(getCellNumber(cellId(c, r), stack));
+            }
+        }
+        return values;
+    }
+
+    function evaluateCell(id, stack = []) {
+        const exp = gridData[id].exp.trim();
+        if (!exp) return '';
+        if (!exp.startsWith('=')) {
+            const num = parseFloat(exp);
+            return /^-?\d+(\.\d+)?$/.test(exp) ? num : exp;
+        }
+
+        try {
+            let code = exp.substring(1).toUpperCase();
+            const ranges = [];
+            code = code.replace(/\b([A-J]\d{1,2}):([A-J]\d{1,2})\b/g, (_, a, b) => {
+                const key = `__R${ranges.length}__`;
+                ranges.push([key, `RANGE('${a}','${b}')`]);
+                return key;
+            });
+            code = code.replace(/\b([A-J]\d{1,2})\b/g, "CELL('$1')");
+            ranges.forEach(([key, value]) => { code = code.replace(key, value); });
+            if (!/^[0-9A-Z_\.\+\-\*\/\(\),'\s]+$/.test(code)) throw new Error('BAD');
+            const SUM = (...args) => args.flat().reduce((a, b) => a + (parseFloat(b) || 0), 0);
+            const AVERAGE = (...args) => {
+                const nums = args.flat().map(Number).filter(n => !isNaN(n));
+                return nums.length ? SUM(nums) / nums.length : 0;
+            };
+            const MIN = (...args) => Math.min(...args.flat().map(Number).filter(n => !isNaN(n)));
+            const MAX = (...args) => Math.max(...args.flat().map(Number).filter(n => !isNaN(n)));
+            const CELL = ref => getCellNumber(ref, stack);
+            const RANGE = (a, b) => getRangeValues(a, b, stack);
+            const result = Function('SUM', 'AVERAGE', 'MIN', 'MAX', 'ROUND', 'ABS', 'CELL', 'RANGE', `"use strict";return (${code})`)(SUM, AVERAGE, MIN, MAX, Math.round, Math.abs, CELL, RANGE);
+            return typeof result === 'number' && isFinite(result) ? Math.round(result * 100000) / 100000 : result;
+        } catch {
+            return '#ERR';
+        }
+    }
+
+    function refreshGrid() {
+        Object.keys(gridData).forEach(id => {
+            gridData[id].val = evaluateCell(id);
+        });
+        for (let id in gridData) {
+            const el = document.getElementById(id);
+            if (!el) continue;
+            el.classList.toggle('formula', gridData[id].exp.trim().startsWith('='));
+            el.classList.toggle('error', gridData[id].val === '#ERR');
+            if (document.activeElement !== el && document.activeElement !== document.getElementById('formula-bar')) {
+                el.value = gridData[id].val ?? '';
+            } else if (gridData[id].exp === '') {
+                el.value = '';
+            }
+        }
+    }
+
+    function clearExcelGrid() {
+        clearFormulaRefSelection();
+        Object.keys(gridData).forEach(id => {
+            gridData[id].exp = '';
+            gridData[id].val = '';
+            const el = document.getElementById(id);
+            if (el) {
+                el.value = '';
+                el.classList.remove('formula', 'error', 'ref-active');
+            }
+        });
+        document.getElementById('formula-bar').value = '';
+        showStatus('Cleared');
+        document.getElementById('A1')?.focus();
+    }
+
+    // --- Main Calculation Logic ---
+    function normalizeHkdRate(raw) {
+        if (!raw) return '';
+        const cleaned = raw.toString().replace(/[^\d.]/g, '');
+        if (!cleaned) return '';
+        const num = parseFloat(cleaned);
+        if (!isNaN(num) && num >= 0.7 && num < 1) return num.toFixed(4);
+
+        const digits = cleaned.replace(/\D/g, '');
+        if (/^0?\d{4}$/.test(digits)) {
+            const rate = parseInt(digits, 10) / 10000;
+            return rate >= 0.7 && rate < 1 ? rate.toFixed(4) : '';
+        }
+        return '';
+    }
+
     function smartExtract() {
         const text = document.getElementById('raw-text').value;
         if (!text) return;
-
-        const numbers = text.match(/\d+\.\d+/g) || [];
+        const nums = text.match(/\d+(?:\.\d+)?/g) || [];
         let renmei = '', renu = '', rengang = '';
-
-        const hkd = numbers.find(n => parseFloat(n) >= 0.1 && parseFloat(n) < 1);
-        if (hkd) rengang = hkd;
-
-        const uRegex = /[uU](?:价|成本)?\s*[:：]?\s*([67]\.\d+)/;
-        const uMatch = text.match(uRegex);
         
-        if (uMatch) {
-            renu = uMatch[1];
+        const hkHint = text.match(/(?:港币|港幣|港|HKD)[^\d]*(0?\d{4}|0?\.\d{3,5})/i);
+        if (hkHint) rengang = normalizeHkdRate(hkHint[1]);
+        if (!rengang) {
+            const hkVal = nums.map(normalizeHkdRate).find(Boolean);
+            if (hkVal) rengang = hkVal;
         }
-
-        const sixSeven = numbers.filter(n => parseFloat(n) >= 6 && parseFloat(n) < 8);
         
-        for (let num of sixSeven) {
-            if (num !== renu && num !== renmei) {
-                if (!renu && num.length > 0) {
-                    renmei = num; 
-                } else if (!renmei) {
-                    renmei = num;
-                }
-            }
-        }
+        const uVal = text.match(/[uU](?:价|成本)?\s*[:：]?\s*([67]\.\d+)/);
+        if (uVal) renu = uVal[1];
+        
+        const mainVal = nums.find(n => parseFloat(n) >= 6 && n !== renu);
+        if (mainVal) renmei = mainVal;
 
         if (renmei) document.getElementById('v-renmei').value = renmei;
-        if (renu) document.getElementById('v-renu').value = renu;
+        if (renu)   document.getElementById('v-renu').value = renu;
         if (rengang) document.getElementById('v-rengang').value = rengang;
-
         autoUpdate();
     }
 
-    // --- 2. 核心计算与文案生成 ---
+    function clearCostGenerator() {
+        document.getElementById('raw-text').value = '';
+        ['v-renmei', 'v-renu', 'v-rengang', 'v-aoren', 'v-usdaud'].forEach(id => {
+            document.getElementById(id).value = '';
+        });
+        document.getElementById('m-pobo').value = '0.4';
+        document.getElementById('m-lp').value = '0.25';
+        autoUpdate();
+    }
+
     function autoUpdate() {
-        const vRenmei = document.getElementById('v-renmei').value;
-        const vRenu = document.getElementById('v-renu').value;
-        const vRengang = document.getElementById('v-rengang').value;
-        const vAoren = document.getElementById('v-aoren').value;
-        const vUsdaud = document.getElementById('v-usdaud').value;
+        const getV = (id) => parseExcelMath(document.getElementById(id).value);
         
-        const mPobo = parseFloat(document.getElementById('m-pobo').value || 0) / 100;
-        const mLp = parseFloat(document.getElementById('m-lp').value || 0) / 100;
-
-        let poboCost = '待更新';
-        let nppCost = '待更新';
-
-        if (vRenu && !isNaN(vRenu)) {
-            poboCost = (parseFloat(vRenu) * (1 + mPobo)).toFixed(4);
-        }
-
-        if (vUsdaud && !isNaN(vUsdaud)) {
-            const lpUsdAud = parseFloat(vUsdaud) * (1 - mLp);
-            
-            document.getElementById('lp-hint').innerText = `辅助锁汇：LP USD/AUD: ${lpUsdAud.toFixed(4)} | LP AUD/USD: ${(1 / lpUsdAud).toFixed(4)}`;
-
-            if (vRenu && !isNaN(vRenu)) {
-                nppCost = (parseFloat(vRenu) / lpUsdAud).toFixed(4);
-            }
+        const u = getV('v-renu');
+        const usdaud = getV('v-usdaud');
+        const p = getV('m-pobo') / 100;
+        const l = getV('m-lp') / 100;
+        
+        let poboCost = '—', nppCost = '—';
+        
+        if (u) poboCost = (u * (1 + p)).toFixed(4);
+        
+        if (usdaud) {
+            const lpRate = usdaud * (1 - l);
+            // 写入新的强调版样式结构
+            document.getElementById('lp-hint').innerHTML = `LP Rate: <span>${lpRate.toFixed(4)}</span> &nbsp;|&nbsp; A/U: <span>${(1/lpRate).toFixed(4)}</span>`;
+            if (u) nppCost = (u / lpRate).toFixed(4);
         } else {
-            document.getElementById('lp-hint').innerText = `辅助锁汇：LP USD/AUD: -- | LP AUD/USD: --`;
+            document.getElementById('lp-hint').innerHTML = `LP Rate: <span>—</span> &nbsp;|&nbsp; A/U: <span>—</span>`;
         }
 
-        const finalTemplate = `今日成本指引：
-人美 ${vRenmei || '待更新'}
-人美POBO  ${poboCost}
-人U ${vRenu || '待更新'}
+        const txtRenmei = document.getElementById('v-renmei').value || '—';
+        const txtRenu = document.getElementById('v-renu').value || '—';
+        const txtRengang = document.getElementById('v-rengang').value || '—';
+        const txtAoren = document.getElementById('v-aoren').value || '—';
+
+        document.getElementById('output-box').value = 
+`今日成本指引：
+人美 ${txtRenmei}
+人美POBO ${poboCost}
+人U ${txtRenu}
 NPP人澳成本 ${nppCost}
-港币 ${vRengang || '待更新'}
-澳人 ${vAoren || '待更新'}`;
-
-        // 写入 textarea 的 value
-        document.getElementById('output-box').value = finalTemplate;
+港币 ${txtRengang}
+澳人 ${txtAoren}`;
     }
 
-    // --- 3. 复制功能 (纯文本模式) ---
     function copyResult() {
-        const outputBox = document.getElementById('output-box');
-        if (outputBox.value.includes('等待数据输入')) return;
-        
-        // 选中 textarea 里的内容
-        outputBox.select();
-        outputBox.setSelectionRange(0, 99999); // 适配移动端
-        
+        const box = document.getElementById('output-box');
+        box.select(); box.setSelectionRange(0, 99999);
         try {
-            // 执行浏览器内置的复制命令，这样复制出来绝对是纯文本
             document.execCommand('copy');
-            alert('文案已成功复制！');
-        } catch (err) {
-            alert('复制失败，请手动选择复制');
-        }
-        
-        // 取消高亮选中状态
-        window.getSelection().removeAllRanges();
+            const btn = document.querySelector('.btn-copy');
+            const origText = btn.innerText;
+            btn.innerText = 'Copied ✓';
+            btn.style.background = '#00c853'; 
+            setTimeout(() => {
+                btn.innerText = origText;
+                btn.style.background = '#2962FF';
+            }, 1500);
+        } catch { alert('Copy Failed'); }
+        window.getSelection()?.removeAllRanges();
     }
 
-    autoUpdate();
+    window.onload = () => { 
+        initExcel(); 
+        autoUpdate(); 
+    };
 </script>
-
 </body>
 </html>
