@@ -207,139 +207,188 @@
         }
         .btn-copy:hover { background: #1e53e5; }
 
-        /* --- Excel-like Workspace (Bottom) --- */
-        .excel-section {
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            height: 168px;
-            min-height: 0;
+        @media (max-width: 980px) {
+            body, html {
+                width: 100%;
+                height: auto;
+                min-height: 100vh;
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+                width: 100%;
+                height: auto;
+                min-height: 100vh;
+                gap: 8px;
+                padding: 8px;
+            }
+
+            .panel {
+                min-height: 320px;
+                height: auto;
+                border-radius: 8px;
+            }
+
+            .tradingview-widget-container {
+                min-height: 320px;
+            }
+
+            .tradingview-widget-container__widget {
+                min-height: 288px;
+            }
+
+            .cost-generator {
+                order: -1;
+                padding: 18px;
+                gap: 18px;
+                min-height: auto;
+            }
+
+            .cg-header {
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .cg-header .links {
+                justify-content: flex-end;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .cg-header .links a {
+                padding: 6px 10px;
+                font-size: 13px;
+            }
+
+            .cg-main {
+                flex-direction: column;
+                gap: 16px;
+                min-height: auto;
+            }
+
+            .cg-left {
+                gap: 16px;
+            }
+
+            .ocr-row {
+                display: grid;
+                grid-template-columns: 1fr auto auto;
+                gap: 8px;
+            }
+
+            .ocr-row textarea {
+                grid-column: 1 / -1;
+                height: 78px;
+            }
+
+            .btn-extract,
+            .ocr-row .btn-clear {
+                min-height: 42px;
+            }
+
+            .control-card {
+                padding: 16px;
+                gap: 18px;
+            }
+
+            .rates-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .input-group label {
+                width: 76px;
+                text-align: left;
+            }
+
+            .margin-row {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .margin-row .input-group {
+                max-width: none !important;
+                flex: 1 1 150px;
+            }
+
+            .lp-highlight {
+                width: 100%;
+                margin-left: 0;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                font-size: 14px;
+                padding: 10px 12px;
+            }
+
+            .cg-right {
+                width: 100%;
+            }
+
+            .output-area {
+                min-height: 180px;
+            }
         }
-        .excel-title { 
-            font-size: 13px; color: #787b86; margin-bottom: 6px;
-            display: flex; justify-content: space-between; align-items: center; font-weight: 600;
-        }
-        .excel-title-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 0;
-        }
-        .excel-title .btn-clear {
-            padding: 4px 10px;
-        }
-        .excel-status {
-            color: #2962FF;
-            max-width: 58%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            text-align: right;
-        }
-        .excel-wrapper {
-            border: 1px solid #d1d4dc;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #ffffff;
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-            flex: 1;
-        }
-        .formula-row {
-            display: grid;
-            grid-template-columns: 74px 34px minmax(0, 1fr);
-            align-items: center;
-            background: #f8f9fd;
-            border-bottom: 1px solid #d1d4dc;
-            min-height: 34px;
-        }
-        .name-box {
-            height: 100%;
-            border: none;
-            border-right: 1px solid #d1d4dc;
-            background: #ffffff;
-            color: #434651;
-            font-size: 13px;
-            font-weight: 700;
-            text-align: center;
-            outline: none;
-        }
-        .fx-label {
-            color: #787b86;
-            font-style: italic;
-            font-weight: 700;
-            text-align: center;
-            border-right: 1px solid #d1d4dc;
-            user-select: none;
-        }
-        .formula-input {
-            height: 100%;
-            border: none;
-            padding: 0 10px;
-            color: #131722;
-            font: 14px "Courier New", Courier, monospace;
-            outline: none;
-        }
-        .sheet-viewport {
-            flex: 1;
-            min-height: 0;
-            overflow: auto;
-            background: #ffffff;
-        }
-        .excel-grid {
-            display: grid;
-            grid-template-columns: 42px repeat(10, minmax(86px, 1fr));
-            grid-auto-rows: 28px;
-            min-width: 902px;
-            background: #d1d4dc;
-            gap: 1px;
-        }
-        .sheet-corner,
-        .col-header,
-        .row-header {
-            background: #f0f3fa;
-            color: #434651;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
-            user-select: none;
-        }
-        .col-header.active,
-        .row-header.active {
-            background: #dbe6ff;
-            color: #2962FF;
-        }
-        .excel-cell {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: #ffffff;
-            padding: 0 8px;
-            color: #131722;
-            font: 14px "Courier New", Courier, monospace;
-            outline: none;
-            transition: background .1s;
-        }
-        .excel-cell:focus {
-            background: #ffffff;
-            color: #131722;
-            box-shadow: inset 0 0 0 2px #2962FF;
-            position: relative;
-            z-index: 2;
-        }
-        .excel-cell.formula {
-            color: #00897b;
-        }
-        .excel-cell.error {
-            color: #d50000;
-            background: #fff5f5;
-        }
-        .excel-cell.ref-active {
-            background: #eef7ff;
-            box-shadow: inset 0 0 0 2px #00a3ff;
+
+        @media (max-width: 560px) {
+            .dashboard {
+                padding: 6px;
+            }
+
+            .panel {
+                min-height: 280px;
+            }
+
+            .tradingview-widget-container {
+                min-height: 280px;
+            }
+
+            .tradingview-widget-container__widget {
+                min-height: 248px;
+            }
+
+            .cost-generator {
+                padding: 14px;
+            }
+
+            .cg-header {
+                flex-direction: column;
+            }
+
+            .cg-header .links {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .cg-header .links a {
+                flex: 1 1 auto;
+                text-align: center;
+            }
+
+            .ocr-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .ocr-row textarea {
+                grid-column: 1 / -1;
+            }
+
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 6px;
+            }
+
+            .input-group label {
+                width: auto;
+            }
+
+            .lp-highlight {
+                display: block;
+                line-height: 1.8;
+            }
         }
     </style>
 </head>
@@ -389,7 +438,7 @@
                         <div class="input-group" style="max-width: 180px;"><label>LP%</label><input type="text" id="m-lp" value="0.25" oninput="autoUpdate()" onblur="evalStandard(this)"></div>
                         
                         <div class="lp-highlight" id="lp-hint">
-                            LP Rate: <span>—</span> &nbsp;|&nbsp; A/U: <span>—</span>
+                            LP Rate: <span>待更新</span> &nbsp;|&nbsp; A/U: <span>待更新</span>
                         </div>
                     </div>
                 </div>
@@ -401,25 +450,6 @@
             </div>
         </div>
 
-        <div class="excel-section">
-            <div class="excel-title">
-                <div class="excel-title-left">
-                    <span>Spreadsheet Workspace</span>
-                    <button class="btn-clear" onclick="clearExcelGrid()">Clear</button>
-                </div>
-                <span id="sheet-status" class="excel-status">Ready</span>
-            </div>
-            <div class="excel-wrapper">
-                <div class="formula-row">
-                    <input class="name-box" id="name-box" value="A1" readonly>
-                    <div class="fx-label">fx</div>
-                    <input class="formula-input" id="formula-bar" autocomplete="off" spellcheck="false">
-                </div>
-                <div class="sheet-viewport">
-                    <div class="excel-grid" id="excel-grid"></div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="panel">
@@ -474,329 +504,6 @@
             if (e.key === 'Enter') this.blur();
         });
     });
-
-    // --- Excel-like Grid ---
-    const gridData = {};
-    const cols = ['A', 'B', 'C', 'D', 'E', 'F'];
-    for (let i = 6; i < 10; i++) cols.push(String.fromCharCode(65 + i));
-    const rows = 20;
-    let activeCell = null;
-    let formulaEditing = false;
-    let formulaRefSelection = null;
-
-    function cellId(colIndex, rowIndex) {
-        return cols[colIndex] + rowIndex;
-    }
-
-    function parseCellId(id) {
-        const match = id.match(/^([A-J])(\d{1,2})$/);
-        if (!match) return null;
-        return { col: cols.indexOf(match[1]), row: parseInt(match[2], 10) };
-    }
-
-    function showStatus(text) {
-        document.getElementById('sheet-status').innerText = text;
-    }
-
-    function initExcel() {
-        const container = document.getElementById('excel-grid');
-        container.innerHTML = '';
-
-        const corner = document.createElement('div');
-        corner.className = 'sheet-corner';
-        container.appendChild(corner);
-
-        cols.forEach(col => {
-            const header = document.createElement('div');
-            header.className = 'col-header';
-            header.id = `col-${col}`;
-            header.innerText = col;
-            container.appendChild(header);
-        });
-
-        for (let r = 1; r <= rows; r++) {
-            const rowHeader = document.createElement('div');
-            rowHeader.className = 'row-header';
-            rowHeader.id = `row-${r}`;
-            rowHeader.innerText = r;
-            container.appendChild(rowHeader);
-
-            for (let c = 0; c < cols.length; c++) {
-                const id = cellId(c, r);
-                gridData[id] = { exp: '', val: '' };
-                const input = document.createElement('input');
-                input.id = id;
-                input.className = 'excel-cell';
-                input.dataset.cell = id;
-                input.autocomplete = 'off';
-                input.spellcheck = false;
-                
-                input.onfocus = () => selectCell(input);
-                input.oninput = () => {
-                    clearFormulaRefSelection();
-                    gridData[id].exp = input.value;
-                    document.getElementById('formula-bar').value = input.value;
-                };
-                input.onblur = () => commitCell(input);
-                input.onkeydown = (e) => handleCellKey(e, input);
-                input.onpaste = (e) => pasteIntoGrid(e, id);
-                input.onmousedown = (e) => {
-                    const bar = document.getElementById('formula-bar');
-                    const formulaText = formulaEditing ? bar.value : activeCell?.value || '';
-                    if (activeCell && activeCell !== input && shouldAppendCellRef(formulaText)) {
-                        e.preventDefault();
-                        appendCellRef(id);
-                        activeCell.focus();
-                    }
-                };
-                container.appendChild(input);
-            }
-        }
-
-        const bar = document.getElementById('formula-bar');
-        bar.onfocus = () => { formulaEditing = true; };
-        bar.oninput = () => {
-            if (!activeCell) return;
-            clearFormulaRefSelection();
-            activeCell.value = bar.value;
-            gridData[activeCell.id].exp = bar.value;
-        };
-        bar.onkeydown = (e) => {
-            if (!activeCell) return;
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                commitCell(activeCell);
-                moveActiveCell(0, 1);
-            } else if (e.key === 'Escape') {
-                e.preventDefault();
-                bar.value = gridData[activeCell.id].exp;
-                activeCell.focus();
-            }
-        };
-        bar.onblur = () => { formulaEditing = false; refreshGrid(); };
-
-        selectCell(document.getElementById('A1'));
-        refreshGrid();
-    }
-
-    function selectCell(input) {
-        if (!input) return;
-        if (activeCell !== input) clearFormulaRefSelection();
-        activeCell = input;
-        document.querySelectorAll('.col-header.active, .row-header.active').forEach(el => el.classList.remove('active'));
-        const pos = parseCellId(input.id);
-        if (pos) {
-            document.getElementById(`col-${cols[pos.col]}`)?.classList.add('active');
-            document.getElementById(`row-${pos.row}`)?.classList.add('active');
-        }
-        document.getElementById('name-box').value = input.id;
-        document.getElementById('formula-bar').value = gridData[input.id].exp;
-        input.value = gridData[input.id].exp;
-        showStatus('Use =A1+B1, =SUM(A1:B3), paste from Excel');
-    }
-
-    function shouldAppendCellRef(text) {
-        const value = (text || '').trim();
-        if (!value.startsWith('=')) return false;
-        return /(?:=|[\+\-\*\/\(,:])\s*$/.test(value);
-    }
-
-    function clearFormulaRefSelection() {
-        if (formulaRefSelection?.refId) {
-            document.getElementById(formulaRefSelection.refId)?.classList.remove('ref-active');
-        }
-        formulaRefSelection = null;
-    }
-
-    function setFormulaRefSelection(refId, start, end) {
-        if (formulaRefSelection?.refId) {
-            document.getElementById(formulaRefSelection.refId)?.classList.remove('ref-active');
-        }
-        formulaRefSelection = { formulaCellId: activeCell.id, refId, start, end };
-        document.getElementById(refId)?.classList.add('ref-active');
-    }
-
-    function appendCellRef(id, replaceCurrent = false) {
-        if (!activeCell) return;
-        const bar = document.getElementById('formula-bar');
-        const target = formulaEditing ? bar : activeCell;
-        const canReplace = replaceCurrent && formulaRefSelection?.formulaCellId === activeCell.id;
-        const start = canReplace ? formulaRefSelection.start : target.selectionStart ?? target.value.length;
-        const end = canReplace ? formulaRefSelection.end : target.selectionEnd ?? target.value.length;
-        const nextValue = target.value.slice(0, start) + id + target.value.slice(end);
-
-        activeCell.value = nextValue;
-        bar.value = nextValue;
-        gridData[activeCell.id].exp = nextValue;
-
-        const nextPos = start + id.length;
-        setFormulaRefSelection(id, start, nextPos);
-        setTimeout(() => {
-            target.focus();
-            target.setSelectionRange(nextPos, nextPos);
-        }, 0);
-    }
-
-    function commitCell(input) {
-        if (!input) return;
-        clearFormulaRefSelection();
-        gridData[input.id].exp = input.value;
-        refreshGrid();
-    }
-
-    function handleCellKey(e, input) {
-        const nav = {
-            ArrowUp: [0, -1],
-            ArrowDown: [0, 1],
-            ArrowLeft: [-1, 0],
-            ArrowRight: [1, 0],
-            Tab: [e.shiftKey ? -1 : 1, 0],
-            Enter: [0, e.shiftKey ? -1 : 1]
-        };
-        if (!nav[e.key]) return;
-        const isEditingFormulaRef = formulaRefSelection?.formulaCellId === input.id;
-        if (e.key.startsWith('Arrow') && input.value.trim().startsWith('=') && (shouldAppendCellRef(input.value) || isEditingFormulaRef)) {
-            e.preventDefault();
-            appendNeighborRef(nav[e.key][0], nav[e.key][1]);
-            return;
-        }
-        e.preventDefault();
-        commitCell(input);
-        moveActiveCell(nav[e.key][0], nav[e.key][1]);
-    }
-
-    function moveActiveCell(colDelta, rowDelta) {
-        if (!activeCell) return;
-        const pos = parseCellId(activeCell.id);
-        if (!pos) return;
-        const nextCol = Math.max(0, Math.min(cols.length - 1, pos.col + colDelta));
-        const nextRow = Math.max(1, Math.min(rows, pos.row + rowDelta));
-        document.getElementById(cellId(nextCol, nextRow))?.focus();
-    }
-
-    function appendNeighborRef(colDelta, rowDelta) {
-        if (!activeCell) return;
-        const baseId = formulaRefSelection?.formulaCellId === activeCell.id ? formulaRefSelection.refId : activeCell.id;
-        const pos = parseCellId(baseId);
-        if (!pos) return;
-        const nextCol = Math.max(0, Math.min(cols.length - 1, pos.col + colDelta));
-        const nextRow = Math.max(1, Math.min(rows, pos.row + rowDelta));
-        const ref = cellId(nextCol, nextRow);
-        if (ref !== activeCell.id) appendCellRef(ref, formulaRefSelection?.formulaCellId === activeCell.id);
-    }
-
-    function pasteIntoGrid(e, startId) {
-        const text = e.clipboardData?.getData('text');
-        if (!text || (!text.includes('\t') && !text.includes('\n'))) return;
-        e.preventDefault();
-        const start = parseCellId(startId);
-        if (!start) return;
-        text.trimEnd().split(/\r?\n/).forEach((line, rOffset) => {
-            line.split('\t').forEach((value, cOffset) => {
-                const col = start.col + cOffset;
-                const row = start.row + rOffset;
-                if (col >= cols.length || row > rows) return;
-                gridData[cellId(col, row)].exp = value;
-            });
-        });
-        refreshGrid();
-        document.getElementById(startId)?.focus();
-        showStatus('Pasted');
-    }
-
-    function getCellNumber(id, stack = []) {
-        if (stack.includes(id)) throw new Error('CIRC');
-        const cell = gridData[id];
-        if (!cell) return 0;
-        const result = evaluateCell(id, [...stack, id]);
-        const num = parseFloat(result);
-        return isNaN(num) ? 0 : num;
-    }
-
-    function getRangeValues(start, end, stack = []) {
-        const a = parseCellId(start);
-        const b = parseCellId(end);
-        if (!a || !b) return [];
-        const values = [];
-        const colMin = Math.min(a.col, b.col);
-        const colMax = Math.max(a.col, b.col);
-        const rowMin = Math.min(a.row, b.row);
-        const rowMax = Math.max(a.row, b.row);
-        for (let r = rowMin; r <= rowMax; r++) {
-            for (let c = colMin; c <= colMax; c++) {
-                values.push(getCellNumber(cellId(c, r), stack));
-            }
-        }
-        return values;
-    }
-
-    function evaluateCell(id, stack = []) {
-        const exp = gridData[id].exp.trim();
-        if (!exp) return '';
-        if (!exp.startsWith('=')) {
-            const num = parseFloat(exp);
-            return /^-?\d+(\.\d+)?$/.test(exp) ? num : exp;
-        }
-
-        try {
-            let code = exp.substring(1).toUpperCase();
-            const ranges = [];
-            code = code.replace(/\b([A-J]\d{1,2}):([A-J]\d{1,2})\b/g, (_, a, b) => {
-                const key = `__R${ranges.length}__`;
-                ranges.push([key, `RANGE('${a}','${b}')`]);
-                return key;
-            });
-            code = code.replace(/\b([A-J]\d{1,2})\b/g, "CELL('$1')");
-            ranges.forEach(([key, value]) => { code = code.replace(key, value); });
-            if (!/^[0-9A-Z_\.\+\-\*\/\(\),'\s]+$/.test(code)) throw new Error('BAD');
-            const SUM = (...args) => args.flat().reduce((a, b) => a + (parseFloat(b) || 0), 0);
-            const AVERAGE = (...args) => {
-                const nums = args.flat().map(Number).filter(n => !isNaN(n));
-                return nums.length ? SUM(nums) / nums.length : 0;
-            };
-            const MIN = (...args) => Math.min(...args.flat().map(Number).filter(n => !isNaN(n)));
-            const MAX = (...args) => Math.max(...args.flat().map(Number).filter(n => !isNaN(n)));
-            const CELL = ref => getCellNumber(ref, stack);
-            const RANGE = (a, b) => getRangeValues(a, b, stack);
-            const result = Function('SUM', 'AVERAGE', 'MIN', 'MAX', 'ROUND', 'ABS', 'CELL', 'RANGE', `"use strict";return (${code})`)(SUM, AVERAGE, MIN, MAX, Math.round, Math.abs, CELL, RANGE);
-            return typeof result === 'number' && isFinite(result) ? Math.round(result * 100000) / 100000 : result;
-        } catch {
-            return '#ERR';
-        }
-    }
-
-    function refreshGrid() {
-        Object.keys(gridData).forEach(id => {
-            gridData[id].val = evaluateCell(id);
-        });
-        for (let id in gridData) {
-            const el = document.getElementById(id);
-            if (!el) continue;
-            el.classList.toggle('formula', gridData[id].exp.trim().startsWith('='));
-            el.classList.toggle('error', gridData[id].val === '#ERR');
-            if (document.activeElement !== el && document.activeElement !== document.getElementById('formula-bar')) {
-                el.value = gridData[id].val ?? '';
-            } else if (gridData[id].exp === '') {
-                el.value = '';
-            }
-        }
-    }
-
-    function clearExcelGrid() {
-        clearFormulaRefSelection();
-        Object.keys(gridData).forEach(id => {
-            gridData[id].exp = '';
-            gridData[id].val = '';
-            const el = document.getElementById(id);
-            if (el) {
-                el.value = '';
-                el.classList.remove('formula', 'error', 'ref-active');
-            }
-        });
-        document.getElementById('formula-bar').value = '';
-        showStatus('Cleared');
-        document.getElementById('A1')?.focus();
-    }
 
     // --- Main Calculation Logic ---
     function normalizeHkdRate(raw) {
@@ -857,7 +564,7 @@
         const p = getV('m-pobo') / 100;
         const l = getV('m-lp') / 100;
         
-        let poboCost = '—', nppCost = '—';
+        let poboCost = '待更新', nppCost = '待更新';
         
         if (u) poboCost = (u * (1 + p)).toFixed(4);
         
@@ -867,13 +574,13 @@
             document.getElementById('lp-hint').innerHTML = `LP Rate: <span>${lpRate.toFixed(4)}</span> &nbsp;|&nbsp; A/U: <span>${(1/lpRate).toFixed(4)}</span>`;
             if (u) nppCost = (u / lpRate).toFixed(4);
         } else {
-            document.getElementById('lp-hint').innerHTML = `LP Rate: <span>—</span> &nbsp;|&nbsp; A/U: <span>—</span>`;
+            document.getElementById('lp-hint').innerHTML = `LP Rate: <span>待更新</span> &nbsp;|&nbsp; A/U: <span>待更新</span>`;
         }
 
-        const txtRenmei = document.getElementById('v-renmei').value || '—';
-        const txtRenu = document.getElementById('v-renu').value || '—';
-        const txtRengang = document.getElementById('v-rengang').value || '—';
-        const txtAoren = document.getElementById('v-aoren').value || '—';
+        const txtRenmei = document.getElementById('v-renmei').value || '待更新';
+        const txtRenu = document.getElementById('v-renu').value || '待更新';
+        const txtRengang = document.getElementById('v-rengang').value || '待更新';
+        const txtAoren = document.getElementById('v-aoren').value || '待更新';
 
         document.getElementById('output-box').value = 
 `今日成本指引：
@@ -902,10 +609,7 @@ NPP人澳成本 ${nppCost}
         window.getSelection()?.removeAllRanges();
     }
 
-    window.onload = () => { 
-        initExcel(); 
-        autoUpdate(); 
-    };
+    window.onload = () => autoUpdate();
 </script>
 </body>
 </html>
